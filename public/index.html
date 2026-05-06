@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate MCQ Quiz</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="shortcut icon" href="favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            /* Light Mode: Professional Blue/Gray */
+            --bg-gradient: linear-gradient(135deg, #f8f9fb 0%, #f0f4f8 50%, #e8ecf1 100%);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(148, 163, 184, 0.2);
+            --text-main: #1e293b;
+            --text-secondary: #64748b;
+            --input-bg: rgba(255, 255, 255, 1);
+            --option-bg-hover: #f1f5f9;
+            --accent-color: #2563eb;
+            --accent-hover: #1d4ed8;
+        }
+
+        .dark {
+            /* Dark Mode: Professional Navy/Slate */
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #1a2332 100%);
+            --glass-bg: rgba(30, 41, 59, 0.95);
+            --glass-border: rgba(148, 163, 184, 0.15);
+            --text-main: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --input-bg: rgba(15, 23, 42, 1);
+            --option-bg-hover: rgba(51, 65, 85, 0.5);
+            --accent-color: #3b82f6;
+            --accent-hover: #2563eb;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            background-size: 100% 100%;
+            min-height: 100vh;
+            color: var(--text-main);
+            transition: color 0.3s ease;
+            letter-spacing: 0.3px;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- UI Components --- */
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 10px 16px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        .glass-panel:hover {
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1), 0 16px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        .glass-input {
+            background: var(--input-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            transition: all 0.2s ease;
+            font-size: 0.9375rem;
+            letter-spacing: 0.2px;
+        }
+        .glass-input:focus {
+            background: var(--input-bg);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+        
+        /* Ensure placeholders are visible in dark mode */
+        .dark .glass-input::placeholder {
+            color: rgba(148, 163, 184, 0.6);
+        }
+
+        /* 3D Buttons */
+        .btn-3d {
+            transition: all 0.2s ease;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .btn-primary-3d {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            box-shadow: 0 4px 0px 0px var(--accent-hover);
+            border-radius: 0.5rem;
+        }
+        .btn-primary-3d:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0px 0px rgba(13, 71, 161, 0.7);
+        }
+        .btn-primary-3d:active { 
+            transform: translateY(2px); 
+            box-shadow: 0 2px 0px 0px rgba(13, 71, 161, 0.7); 
+        }
+
+        .btn-secondary-3d {
+            background-color: #e2e8f0;
+            color: #1e293b;
+            box-shadow: 0 4px 0px 0px #cbd5e1;
+            border-radius: 0.5rem;
+        }
+        .dark .btn-secondary-3d {
+            background-color: #475569;
+            color: #f1f5f9;
+            box-shadow: 0 4px 0px 0px #1e293b;
+        }
+        .btn-secondary-3d:hover { 
+            transform: translateY(-2px);
+            background-color: #d1d5db;
+        }
+        .dark .btn-secondary-3d:hover {
+            background-color: #64748b;
+        }
+        .btn-secondary-3d:active { 
+            transform: translateY(2px); 
+            box-shadow: 0 2px 0px rgba(0,0,0,0.1);
+        }
+
+        /* Option Card Styles */
+        .option-card {
+            background: rgba(255, 255, 255, 0.7); 
+            border: 1.5px solid #e2e8f0;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .dark .option-card {
+            background: rgba(30, 41, 59, 0.8); 
+            border-color: rgba(148, 163, 184, 0.2);
+        }
+
+        .option-card:hover {
+            transform: translateY(-2px);
+            background: var(--option-bg-hover);
+            border-color: var(--accent-color);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+        }
+
+        .option-card.selected {
+            border-color: var(--accent-color);
+            background-color: rgba(37, 99, 235, 0.08);
+            box-shadow: 0 0 0 2px var(--accent-color);
+        }
+
+        .dark .option-card.selected {
+            background-color: rgba(59, 130, 246, 0.15);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: rgba(148, 163, 184, 0.2);
+            border-radius: 99px;
+            overflow: hidden;
+            height: 6px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2563eb, #1d4ed8);
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 8px rgba(37, 99, 235, 0.4);
+        }
+
+        /* Score History Item */
+        .history-item {
+            border-left: 3px solid #94a3b8;
+            transition: all 0.2s;
+            padding: 0.75rem 0.75rem;
+            background: rgba(148, 163, 184, 0.05);
+            border-radius: 0.375rem;
+        }
+        .history-item:hover {
+            background: rgba(37, 99, 235, 0.08);
+            border-left-color: var(--accent-color);
+        }
+        .history-item.excellent { border-left-color: #16a34a; }
+        .history-item.good { border-left-color: #ca8a04; }
+        .history-item.average { border-left-color: #dc2626; }
+
+        /* Animations */
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-enter { animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 50;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            padding: 10px 11px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease;
+        }
+        .theme-toggle:hover { 
+            transform: scale(1.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+        .theme-toggle:active {
+            transform: scale(0.96);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center py-8 px-4 transition-colors duration-300">
+
+    <button onclick="toggleTheme()" class="theme-toggle" aria-label="Toggle Dark Mode">
+        <i data-lucide="sun" class="w-6 h-6 text-yellow-500 hidden dark:block"></i>
+        <i data-lucide="moon" class="w-6 h-6 text-fuchsia-600 block dark:hidden"></i>
+    </button>
+
+    <!-- LEFT SIDEBAR DROPDOWN -->
+    <div class="fixed left-6 top-6 z-50">
+        <div class="relative">
+            <button onclick="toggleModeDropdown()" id="modeDropdownBtn" 
+                class="btn-3d btn-primary-3d px-6 py-3 font-bold flex items-center gap-2 shadow-xl rounded-lg">
+                <i data-lucide="menu" class="w-5 h-5"></i> 
+                <span id="currentModeText">MCQ Questions</span>
+                <i data-lucide="chevron-down" class="w-4 h-4 transition-transform" id="chevronIcon"></i>
+            </button>
+            
+            <div id="modeDropdown" class="hidden absolute left-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-gray-200 dark:border-slate-600 overflow-hidden animate-enter z-50">
+                <button onclick="switchMode('mcq'); toggleModeDropdown()" 
+                    class="w-full px-4 py-3 text-left hover:bg-blue-50 dark:hover:bg-slate-700 flex items-center gap-3 transition-colors border-b border-gray-100 dark:border-slate-700">
+                    <i data-lucide="brain" class="w-5 h-5 text-blue-600"></i>
+                    <span class="font-semibold text-gray-800 dark:text-white">MCQ Questions</span>
+                </button>
+                <button onclick="switchMode('subjective'); toggleModeDropdown()" 
+                    class="w-full px-4 py-3 text-left hover:bg-blue-50 dark:hover:bg-slate-700 flex items-center gap-3 transition-colors border-b border-gray-100 dark:border-slate-700">
+                    <i data-lucide="file-text" class="w-5 h-5 text-amber-600"></i>
+                    <span class="font-semibold text-gray-800 dark:text-white">Subjective (10-Mark)</span>
+                </button>
+                <button onclick="switchMode('assistant'); toggleModeDropdown()" 
+                    class="w-full px-4 py-3 text-left hover:bg-blue-50 dark:hover:bg-slate-700 flex items-center gap-3 transition-colors">
+                    <i data-lucide="sparkles" class="w-5 h-5 text-purple-600"></i>
+                    <span class="font-semibold text-gray-800 dark:text-white">AI Study Assistant</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="setupScreen" class="w-full max-w-5xl transition-all duration-300 animate-enter">
+
+        <header class="mb-8 text-center drop-shadow-md">
+            <h1 class="text-4xl md:text-5xl font-extrabold flex justify-center items-center gap-4 mb-2 tracking-tight text-white drop-shadow-lg">
+                <div class="bg-white backdrop-blur text-black p-3 rounded-2xl shadow-lg transform -rotate-3">
+                    <i data-lucide="graduation-cap" class="w-8 h-8 md:w-10 md:h-10"></i> 
+                </div>
+                MCQ Generator
+            </h1>
+            <p class="text-white text-lg font-medium drop-shadow-md">AI-Powered • Violet Pink Edition</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-4 space-y-6">
+                <div class="glass-panel p-6 md:p-8 rounded-3xl">
+                    <h2 class="text-xl font-bold mb-6 flex items-center gap-3 border-b border-gray-300 pb-4 text-black dark:text-white">
+                        <i data-lucide="settings" class="w-6 h-6 text-black dark:text-gray-300"></i> Configuration
+                    </h2>
+                    <div class="space-y-5">
+                        <div class="group">
+                            <label class="block text-xs font-bold uppercase text-black dark:text-gray-300 mb-2 tracking-wider">Backend URL</label>
+                            <input type="text" id="backendUrl" value="http://localhost:3000/api" 
+                                class="glass-input w-full p-3 text-sm rounded-xl outline-none font-mono placeholder-gray-400 dark:placeholder-gray-500">
+                        </div>
+                        <div class="group">
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="block text-xs font-bold uppercase text-fuchsia-500 tracking-wider">AI API Key</label>
+                                <span id="providerBadge" class="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-gray-200 text-gray-500 transition-all duration-300">Detecting...</span>
+                            </div>
+                            <input type="password" id="apiKey" oninput="detectProvider()" placeholder="Paste your Gemini, Groq, or OpenAI key..." 
+                                class="glass-input w-full p-3 text-sm rounded-xl outline-none font-mono placeholder-gray-400 dark:placeholder-gray-500">
+                            <p class="text-[10px] text-gray-500 mt-2 italic">Supports: AIza... (Gemini), gsk_... (Groq), sk-... (OpenAI)</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-fuchsia-500 mb-2 tracking-wider">Difficulty</label>
+                                <div class="relative">
+                                    <select id="difficulty" class="glass-input w-full p-3 text-sm rounded-xl outline-none appearance-none cursor-pointer">
+                                        <option value="Easy" class="text-gray-900 bg-white">Easy</option>
+                                        <option value="Medium" selected class="text-gray-900 bg-white">Medium</option>
+                                        <option value="Hard" class="text-gray-900 bg-white">Hard</option>
+                                    </select>
+                                    <i data-lucide="chevron-down" class="absolute right-3 top-3.5 w-4 h-4 text-gray-400 pointer-events-none"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-fuchsia-500 mb-2 tracking-wider">Count</label>
+                                <input type="number" id="maxQuestions" min="1" max="200" value="50"
+                                    class="glass-input w-full p-3 text-sm rounded-xl outline-none font-bold text-center">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-fuchsia-500 mb-2 tracking-wider">Timer (Minutes)</label>
+                            <input type="number" id="quizTimerInput" min="1" placeholder="Default: No Limit"
+                                class="glass-input w-full p-3 text-sm rounded-xl outline-none font-bold text-center placeholder-gray-400 dark:placeholder-gray-500">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-3xl">
+                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-black dark:text-white">
+                        <i data-lucide="history" class="w-5 h-5 text-black dark:text-gray-300"></i> Recent Scores
+                    </h2>
+                    <div id="historyList" class="space-y-3 max-h-48 overflow-y-auto pr-2">
+                        <div class="text-sm text-gray-500 dark:text-gray-300 text-center py-2">No quiz history found.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8 glass-panel p-6 md:p-8 rounded-3xl flex flex-col">
+                <h2 class="text-xl font-bold mb-6 flex items-center gap-3 border-b border-gray-300 pb-4 text-black dark:text-white">
+                    <i data-lucide="book-open" class="w-6 h-6 text-black dark:text-gray-300"></i> Learning Material
+                </h2>
+                <div class="relative flex-grow">
+                    <textarea id="content" 
+                        class="glass-input w-full h-64 lg:h-full p-5 text-sm rounded-2xl outline-none resize-none leading-relaxed text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                        placeholder="Paste your study notes, articles, or documentation here..."></textarea>
+                </div>
+                
+                <div class="mt-6">
+                    <button onclick="generateQuiz()" id="generateBtn"
+                        class="btn-3d btn-primary-3d w-full font-bold py-4 px-6 text-lg flex justify-center items-center gap-3">
+                        <i data-lucide="zap" class="w-6 h-6 fill-current"></i> Generate Quiz
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading" class="hidden mt-12 text-center animate-enter">
+            <div class="inline-flex flex-col items-center justify-center p-8 glass-panel rounded-3xl max-w-md">
+                <div class="relative mb-4">
+                    <div class="w-16 h-16 border-4 border-fuchsia-200 border-t-fuchsia-600 rounded-full animate-spin"></div>
+                    <i data-lucide="brain-circuit" class="w-8 h-8 text-fuchsia-600 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></i>
+                </div>
+                <span class="text-xl font-bold text-gray-800 dark:text-white">Constructing Quiz...</span>
+                <p class="text-sm opacity-70 mt-2 mb-6 text-gray-600 dark:text-gray-300">Analyzing content and formulating questions</p>
+                
+                <!-- Progress Bar and Percentage -->
+                <div class="w-full">
+                    <div class="flex justify-between text-xs font-bold text-gray-600 dark:text-gray-300 mb-2">
+                        <span>Progress</span>
+                        <span id="constructionPercentage">0%</span>
+                    </div>
+                    <div class="progress-container shadow-inner w-full">
+                        <div id="constructionProgressBar" class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="error" class="hidden mt-6 p-4 bg-red-100/90 dark:bg-red-900/50 backdrop-blur-md text-red-700 dark:text-red-200 rounded-2xl border border-red-200 dark:border-red-800 text-center font-medium shadow-lg animate-enter"></div>
+    </div>
+
+    <div id="quizArena" class="hidden w-full max-w-3xl mt-4">
+        
+        <div class="w-full mb-6 animate-enter">
+            <div class="flex justify-between text-white text-xs font-bold uppercase tracking-wider mb-2 px-1 drop-shadow-sm">
+                <span class="flex items-center gap-2">Progress</span>
+                <span id="progressText">0%</span>
+            </div>
+            <div class="progress-container shadow-inner">
+                <div id="progressBar" class="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center mb-4 text-white animate-enter gap-4 flex-wrap">
+            <span id="questionCounter" class="bg-black/20 backdrop-blur-md px-4 py-2 rounded-full text-sm font-bold border border-white/10 shadow-sm">
+                Question 1
+            </span>
+            <span id="timerDisplay" class="bg-red-500/90 backdrop-blur-md px-4 py-2 rounded-full text-sm font-bold border border-red-400/30 shadow-md flex items-center gap-2 animate-pulse">
+                <i data-lucide="clock" class="w-4 h-4"></i> <span id="timerText">No Time Limit</span>
+            </span>
+            <button onclick="resetApp()" class="text-white/80 hover:text-white hover:bg-white/20 px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 text-sm font-medium ml-auto">
+                <i data-lucide="x" class="w-4 h-4"></i> Quit
+            </button>
+        </div>
+
+        <div class="glass-panel p-6 md:p-10 rounded-3xl shadow-2xl animate-enter">
+            <div class="mb-8">
+                <h2 id="questionText" class="text-xl md:text-2xl font-bold leading-relaxed text-gray-900 dark:text-gray-100"></h2>
+            </div>
+            
+            <div id="optionsContainer" class="grid gap-4">
+                </div>
+        </div>
+
+        <div class="mt-8 flex justify-between gap-4 animate-enter">
+            <button id="prevBtn" onclick="prevQuestion()"
+                class="hidden btn-3d btn-secondary-3d px-8 py-4 font-bold text-lg flex items-center gap-2 shadow-xl opacity-80 hover:opacity-100">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i> Prev
+            </button>
+
+            <button id="skipBtn" onclick="skipQuestion()"
+                class="px-8 py-4 font-bold text-lg flex items-center gap-2 shadow-xl rounded-lg transition-all cursor-pointer bg-orange-500 hover:bg-orange-600 text-white active:scale-95">
+                <i data-lucide="forward" class="w-5 h-5"></i> Skip
+            </button>
+
+            <button id="nextBtn" onclick="nextQuestion()"
+                class="btn-3d btn-secondary-3d px-10 py-4 font-bold text-lg flex items-center gap-2 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed ml-auto">
+                Next <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="reviewScreen" class="hidden w-full max-w-4xl animate-enter">
+        <header class="mb-10 flex flex-col md:flex-row justify-between items-center gap-4">
+            <h1 class="text-4xl font-extrabold text-white drop-shadow-md">Performance Review</h1>
+            <button onclick="resetApp()" class="bg-white text-fuchsia-600 px-8 py-3 rounded-xl font-bold shadow-lg hover:scale-105 transition-transform">Start New Quiz</button>
+        </header>
+
+        <!-- Performance Stats Circles -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10 px-4 py-8 bg-gradient-to-b from-transparent to-slate-50/20 dark:to-slate-900/20 rounded-3xl">
+            <!-- Score Card -->
+            <div class="flex items-center justify-center">
+                <div class="relative w-40 h-40 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 p-1 shadow-xl hover:shadow-2xl transition-shadow duration-300">
+                    <div class="w-full h-full rounded-full bg-slate-100 dark:bg-slate-900 flex flex-col items-center justify-center">
+                        <p class="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">Score</p>
+                        <h3 id="statsScore" class="text-4xl font-black text-blue-600 dark:text-blue-400 mt-2 tabular-nums">0/0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accuracy Card -->
+            <div class="flex items-center justify-center">
+                <div class="relative w-40 h-40 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 p-1 shadow-xl hover:shadow-2xl transition-shadow duration-300">
+                    <div class="w-full h-full rounded-full bg-slate-100 dark:bg-slate-900 flex flex-col items-center justify-center">
+                        <p class="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">Accuracy</p>
+                        <h3 id="statsAccuracy" class="text-4xl font-black text-green-600 dark:text-green-400 mt-2 tabular-nums">0%</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Time Taken Card -->
+            <div class="flex items-center justify-center">
+                <div class="relative w-40 h-40 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 p-1 shadow-xl hover:shadow-2xl transition-shadow duration-300">
+                    <div class="w-full h-full rounded-full bg-slate-100 dark:bg-slate-900 flex flex-col items-center justify-center">
+                        <p class="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">Time Taken</p>
+                        <h3 id="statsTime" class="text-3xl font-black text-purple-600 dark:text-purple-400 mt-2 tabular-nums">0m</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attempted Card -->
+            <div class="flex items-center justify-center">
+                <div class="relative w-40 h-40 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 p-1 shadow-xl hover:shadow-2xl transition-shadow duration-300">
+                    <div class="w-full h-full rounded-full bg-slate-100 dark:bg-slate-900 flex flex-col items-center justify-center">
+                        <p class="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">Attempted</p>
+                        <h3 id="statsAttempted" class="text-4xl font-black text-orange-600 dark:text-orange-400 mt-2 tabular-nums">0/0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="reviewList" class="space-y-6"></div>
+    </div>
+
+    <!-- SUBJECTIVE QUESTIONS SECTION -->
+    <div id="subjectiveSetupScreen" class="hidden w-full max-w-5xl transition-all duration-300 animate-enter">
+        <div class="flex justify-between items-start mb-8">
+            <button onclick="switchMode('mcq')" class="btn-3d btn-secondary-3d px-4 py-2 font-bold flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                <span>Back to MCQ</span>
+            </button>
+            <div></div>
+        </div>
+        <header class="mb-8 text-center drop-shadow-md">
+            <h1 class="text-4xl md:text-5xl font-extrabold flex justify-center items-center gap-4 mb-2 tracking-tight text-white drop-shadow-lg">
+                <div class="bg-white backdrop-blur text-black p-3 rounded-2xl shadow-lg transform -rotate-3">
+                    <i data-lucide="file-text" class="w-8 h-8 md:w-10 md:h-10"></i> 
+                </div>
+                Subjective Questions
+            </h1>
+            <p class="text-white text-lg font-medium drop-shadow-md">10-Mark Questions • Answer Based Assessment</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+            <div class="lg:col-span-4 space-y-6">
+                <div class="glass-panel p-6 md:p-8 rounded-3xl">
+                    <h2 class="text-xl font-bold mb-6 flex items-center gap-3 border-b border-gray-300 pb-4 text-black dark:text-white">
+                        <i data-lucide="settings" class="w-6 h-6 text-black dark:text-gray-300"></i> Configuration
+                    </h2>
+                    <div class="space-y-5">
+                        <div class="group">
+                            <label class="block text-xs font-bold uppercase text-black dark:text-gray-300 mb-2 tracking-wider">Backend URL</label>
+                            <input type="text" id="subjectiveBackendUrl" value="http://localhost:3000/api" 
+                                class="glass-input w-full p-3 text-sm rounded-xl outline-none font-mono placeholder-gray-400 dark:placeholder-gray-500">
+                        </div>
+                        <div class="group">
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="block text-xs font-bold uppercase text-fuchsia-500 tracking-wider">AI API Key</label>
+                                <span id="subjectiveProviderBadge" class="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-gray-200 text-gray-500 transition-all duration-300">Detecting...</span>
+                            </div>
+                            <input type="password" id="subjectiveApiKey" oninput="detectSubjectiveProvider()" placeholder="Paste your Gemini, Groq, or OpenAI key..." 
+                                class="glass-input w-full p-3 text-sm rounded-xl outline-none font-mono placeholder-gray-400 dark:placeholder-gray-500">
+                            <p class="text-[10px] text-gray-500 mt-2 italic">Supports: AIza... (Gemini), gsk_... (Groq), sk-... (OpenAI)</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-fuchsia-500 mb-2 tracking-wider">Difficulty</label>
+                                <div class="relative">
+                                    <select id="subjectiveDifficulty" class="glass-input w-full p-3 text-sm rounded-xl outline-none appearance-none cursor-pointer">
+                                        <option value="Easy" class="text-gray-900 bg-white">Easy (Descriptive)</option>
+                                        <option value="Medium" selected class="text-gray-900 bg-white">Medium (Analytical)</option>
+                                        <option value="Hard" class="text-gray-900 bg-white">Hard (Critical Thinking)</option>
+                                    </select>
+                                    <i data-lucide="chevron-down" class="absolute right-3 top-3.5 w-4 h-4 text-gray-400 pointer-events-none"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-fuchsia-500 mb-2 tracking-wider">Count</label>
+                                <input type="number" id="subjectiveQuestionCount" min="1" max="20" value="5"
+                                    class="glass-input w-full p-3 text-sm rounded-xl outline-none font-bold text-center">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-fuchsia-500 mb-2 tracking-wider">Marks Per Question</label>
+                            <input type="number" id="marksPerQuestion" min="1" max="20" value="10"
+                                class="glass-input w-full p-3 text-sm rounded-xl outline-none font-bold text-center">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-3xl">
+                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-black dark:text-white">
+                        <i data-lucide="history" class="w-5 h-5 text-black dark:text-gray-300"></i> Recent Scores
+                    </h2>
+                    <div id="subjectiveHistoryList" class="space-y-3 max-h-48 overflow-y-auto pr-2">
+                        <div class="text-sm text-gray-500 dark:text-gray-300 text-center py-2">No quiz history found.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8 glass-panel p-6 md:p-8 rounded-3xl flex flex-col">
+                <h2 class="text-xl font-bold mb-6 flex items-center gap-3 border-b border-gray-300 pb-4 text-black dark:text-white">
+                    <i data-lucide="book-open" class="w-6 h-6 text-black dark:text-gray-300"></i> Topics/Content
+                </h2>
+                <div class="relative flex-grow">
+                    <textarea id="subjectiveContent" 
+                        class="glass-input w-full h-64 lg:h-full p-5 text-sm rounded-2xl outline-none resize-none leading-relaxed text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                        placeholder="Paste topics, chapter content, or study notes for subjective questions..."></textarea>
+                </div>
+                
+                <div class="mt-6">
+                    <button onclick="generateSubjectiveQuestions()" id="subjectiveGenerateBtn"
+                        class="btn-3d btn-primary-3d w-full font-bold py-4 px-6 text-lg flex justify-center items-center gap-3">
+                        <i data-lucide="zap" class="w-6 h-6 fill-current"></i> Generate Questions
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="subjectiveLoading" class="hidden mt-12 text-center animate-enter">
+            <div class="inline-flex flex-col items-center justify-center p-8 glass-panel rounded-3xl max-w-md">
+                <div class="relative mb-4">
+                    <div class="w-16 h-16 border-4 border-amber-200 border-t-amber-600 rounded-full animate-spin"></div>
+                    <i data-lucide="brain-circuit" class="w-8 h-8 text-amber-600 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></i>
+                </div>
+                <span class="text-xl font-bold text-gray-800 dark:text-white">Generating Questions...</span>
+                <p class="text-sm opacity-70 mt-2 mb-6 text-gray-600 dark:text-gray-300">Creating objective-type subjective questions</p>
+                
+                <div class="w-full">
+                    <div class="flex justify-between text-xs font-bold text-gray-600 dark:text-gray-300 mb-2">
+                        <span>Progress</span>
+                        <span id="subjectiveProgressPercentage">0%</span>
+                    </div>
+                    <div class="progress-container shadow-inner w-full">
+                        <div id="subjectiveProgressBar" class="progress-fill" style="width: 0%; background: linear-gradient(90deg, #f59e0b, #d97706);"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="subjectiveError" class="hidden mt-6 p-4 bg-red-100/90 dark:bg-red-900/50 backdrop-blur-md text-red-700 dark:text-red-200 rounded-2xl border border-red-200 dark:border-red-800 text-center font-medium shadow-lg animate-enter"></div>
+    </div>
+
+    <!-- SUBJECTIVE QUIZ ARENA -->
+    <div id="subjectiveQuizArena" class="hidden w-full max-w-4xl mt-4">
+        <div class="w-full mb-6 animate-enter">
+            <div class="flex justify-between text-white text-xs font-bold uppercase tracking-wider mb-2 px-1 drop-shadow-sm">
+                <span>Progress</span>
+                <span id="subjectiveProgressText">0%</span>
+            </div>
+            <div class="progress-container shadow-inner">
+                <div id="subjectiveProgressBarQuiz" class="progress-fill" style="background: linear-gradient(90deg, #f59e0b, #d97706);"></div>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center mb-4 text-white animate-enter">
+            <span id="subjectiveQuestionCounter" class="bg-black/20 backdrop-blur-md px-4 py-2 rounded-full text-sm font-bold border border-white/10 shadow-sm">
+                Question 1
+            </span>
+            <button onclick="resetApp()" class="text-white/80 hover:text-white hover:bg-white/20 px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 text-sm font-medium">
+                <i data-lucide="x" class="w-4 h-4"></i> Quit
+            </button>
+        </div>
+
+        <!-- SUBMISSION INSTRUCTIONS -->
+        <div class="glass-panel p-4 md:p-6 rounded-2xl shadow-lg mb-6 animate-enter bg-blue-50/50 dark:bg-blue-900/30 border border-blue-200/50 dark:border-blue-800/50">
+            <div class="flex items-start gap-3">
+                <i data-lucide="info" class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"></i>
+                <div>
+                    <p class="text-sm font-semibold text-blue-900 dark:text-blue-200 mb-2">Submission Instructions:</p>
+                    <ul class="text-xs text-blue-800 dark:text-blue-300 space-y-1 list-disc list-inside">
+                        <li>Type your answers in the space provided below.</li>
+                        <li>Follow the same order of questions as specified.</li>
+                        <li>Do not include any diagrams while answering.</li>
+                        <li>All questions are compulsory.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-panel p-6 md:p-10 rounded-3xl shadow-2xl animate-enter">
+            <div class="mb-8">
+                <div class="flex items-start justify-between mb-2">
+                    <h2 id="subjectiveQuestionText" class="text-xl md:text-2xl font-bold leading-relaxed text-gray-900 dark:text-gray-100 flex-1"></h2>
+                    <span id="questionMarks" class="bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 px-3 py-1 rounded-lg text-sm font-bold whitespace-nowrap ml-4">10 Marks</span>
+                </div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 italic">Write a comprehensive answer</p>
+            </div>
+            
+            <div class="mb-6">
+                <textarea id="subjectiveAnswerInput" 
+                    class="glass-input w-full h-40 p-4 text-sm rounded-2xl outline-none resize-none leading-relaxed text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                    placeholder="Type your answer here..."></textarea>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Word count: <span id="wordCount">0</span></p>
+            </div>
+        </div>
+
+        <div class="mt-8 flex justify-between gap-4 animate-enter">
+            <button id="subjectivePrevBtn" onclick="subjectivePrevQuestion()"
+                class="hidden btn-3d btn-secondary-3d px-8 py-4 font-bold text-lg flex items-center gap-2 shadow-xl opacity-80 hover:opacity-100">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i> Prev
+            </button>
+
+            <button id="subjectiveNextBtn" onclick="subjectiveNextQuestion()"
+                class="btn-3d btn-secondary-3d px-10 py-4 font-bold text-lg flex items-center gap-2 shadow-xl ml-auto">
+                Next <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- SUBJECTIVE REVIEW SCREEN -->
+    <div id="subjectiveReviewScreen" class="hidden w-full max-w-4xl animate-enter">
+        <div class="flex justify-between items-start mb-8">
+            <button onclick="resetSubjective()" class="btn-3d btn-secondary-3d px-4 py-2 font-bold flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                <span>Back to Setup</span>
+            </button>
+            <div></div>
+        </div>
+        
+        <header class="mb-10 text-center">
+            <h1 class="text-4xl font-extrabold text-white drop-shadow-md mb-2">Subjective Questions</h1>
+            <p class="text-white text-lg font-medium drop-shadow-md">Answers Summary</p>
+        </header>
+
+        <div class="bg-gradient-to-r from-amber-900 to-yellow-900 text-white p-8 rounded-3xl shadow-xl mb-10 flex items-center justify-between border border-amber-500 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-16 -mt-16 pointer-events-none"></div>
+            <div class="relative z-10">
+                <p class="text-amber-200 text-sm uppercase tracking-widest font-bold mb-1">Total Marks</p>
+                <h2 id="subjectiveTotalMarks" class="text-6xl font-black tracking-tighter">0 / 50</h2>
+            </div>
+            <div class="h-20 w-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-inner transform rotate-12">
+                <i data-lucide="file-check" class="w-10 h-10 text-yellow-300"></i>
+            </div>
+        </div>
+
+        <div id="subjectiveReviewList" class="space-y-6"></div>
+    </div>
+
+    <div id="resultModal" class="hidden fixed inset-0 bg-gray-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-opacity duration-300">
+        <div class="glass-panel rounded-3xl shadow-2xl max-w-sm w-full p-8 text-center transform transition-all scale-100 bg-white/90 dark:bg-gray-800/90">
+            <div class="mx-auto w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6 animate-bounce">
+                <i data-lucide="party-popper" class="w-12 h-12 text-green-600"></i>
+            </div>
+            <h2 class="text-3xl font-bold mb-1 text-gray-900 dark:text-white">Quiz Complete!</h2>
+            <div id="masteryLevel" class="text-lg font-bold mb-6 tracking-wide uppercase"></div>
+            
+            <div class="bg-gray-100 dark:bg-gray-700/50 rounded-2xl p-6 mb-8 border border-gray-200 dark:border-gray-600">
+                <span class="text-gray-500 dark:text-gray-300 text-xs font-bold uppercase tracking-widest">Accuracy</span>
+                <div id="modalScore" class="text-5xl font-black text-black dark:text-white mt-2 tracking-tighter">0%</div>
+            </div>
+            
+            <div class="space-y-3">
+                <button onclick="showReview()" class="btn-3d btn-primary-3d w-full py-3.5 text-base font-bold">See Detailed Review</button>
+                <button onclick="resetApp()" class="w-full bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 font-semibold py-3.5 rounded-xl transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI STUDY ASSISTANT SCREEN -->
+    <div id="assistantScreen" class="hidden w-full max-w-5xl transition-all duration-300 animate-enter">
+        <div class="flex justify-between items-start mb-8">
+            <button onclick="switchMode('mcq')" class="btn-3d btn-secondary-3d px-4 py-2 font-bold flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                <span>Back</span>
+            </button>
+            <div></div>
+        </div>
+        <header class="mb-8 text-center drop-shadow-md">
+            <h1 class="text-4xl md:text-5xl font-extrabold flex justify-center items-center gap-4 mb-2 tracking-tight text-white drop-shadow-lg">
+                <div class="bg-white backdrop-blur text-black p-3 rounded-2xl shadow-lg transform -rotate-3">
+                    <i data-lucide="sparkles" class="w-8 h-8 md:w-10 md:h-10"></i> 
+                </div>
+                AI Study Assistant
+            </h1>
+            <p class="text-white text-lg font-medium drop-shadow-md">Ask Questions • Generate Study Guides • Explain Concepts</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Configuration Panel -->
+            <div class="glass-panel p-6 rounded-3xl h-fit">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-black dark:text-white">
+                    <i data-lucide="settings" class="w-5 h-5"></i> Configuration
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-fuchsia-500 mb-2">AI Provider</label>
+                        <span id="assistantProviderBadge" class="text-xs font-black uppercase px-2 py-1 rounded-md bg-gray-200 text-gray-600">Detecting...</span>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-fuchsia-500 mb-2">API Key</label>
+                        <input type="password" id="assistantApiKey" oninput="detectAssistantProvider()" placeholder="Paste your API key..." 
+                            class="glass-input w-full p-3 text-sm rounded-xl outline-none font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-fuchsia-500 mb-2">Study Level</label>
+                        <select id="assistantLevel" class="glass-input w-full p-3 text-sm rounded-xl outline-none appearance-none cursor-pointer">
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate" selected>Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Chat Panel -->
+            <div class="lg:col-span-2 glass-panel p-6 rounded-3xl flex flex-col" style="height: 600px;">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-black dark:text-white border-b border-gray-300 pb-3">
+                    <i data-lucide="message-circle" class="w-5 h-5"></i> Assistant Chat
+                </h2>
+                
+                <div id="assistantChatBox" class="flex-grow overflow-y-auto mb-4 space-y-3 pr-2">
+                    <div class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+                        👋 Welcome! Ask me anything about your studies.
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <input type="text" id="assistantInput" placeholder="Ask a question..." 
+                        class="glass-input flex-grow p-3 text-sm rounded-xl outline-none" onkeypress="handleAssistantKeypress(event)">
+                    <button onclick="sendAssistantMessage()" class="btn-3d btn-primary-3d px-4 py-2 rounded-xl font-bold flex items-center gap-2">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tools Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <!-- Study Guide Generator -->
+            <div class="glass-panel p-6 rounded-3xl">
+                <h3 class="text-lg font-bold mb-3 flex items-center gap-2 text-black dark:text-white">
+                    <i data-lucide="book" class="w-5 h-5"></i> Study Guide
+                </h3>
+                <textarea id="studyTopics" placeholder="Enter topics or content..." class="glass-input w-full p-3 text-sm rounded-xl outline-none resize-none mb-3" rows="3"></textarea>
+                <button onclick="generateStudyGuide()" class="btn-3d btn-primary-3d w-full py-2 font-bold text-sm rounded-xl">Generate Guide</button>
+            </div>
+
+            <!-- Concept Explainer -->
+            <div class="glass-panel p-6 rounded-3xl">
+                <h3 class="text-lg font-bold mb-3 flex items-center gap-2 text-black dark:text-white">
+                    <i data-lucide="lightbulb" class="w-5 h-5"></i> Explain Concept
+                </h3>
+                <input type="text" id="conceptInput" placeholder="Enter a concept..." class="glass-input w-full p-3 text-sm rounded-xl outline-none mb-3">
+                <button onclick="explainConcept()" class="btn-3d btn-primary-3d w-full py-2 font-bold text-sm rounded-xl">Get Explanation</button>
+            </div>
+
+            <!-- Q&A Helper -->
+            <div class="glass-panel p-6 rounded-3xl">
+                <h3 class="text-lg font-bold mb-3 flex items-center gap-2 text-black dark:text-white">
+                    <i data-lucide="help-circle" class="w-5 h-5"></i> Q&A Helper
+                </h3>
+                <textarea id="questionText" placeholder="Paste a question..." class="glass-input w-full p-3 text-sm rounded-xl outline-none resize-none mb-3" rows="3"></textarea>
+                <button onclick="getQuestionHelp()" class="btn-3d btn-primary-3d w-full py-2 font-bold text-sm rounded-xl">Get Help</button>
+            </div>
+        </div>
+
+        <!-- Loading and Error States -->
+        <div id="assistantLoading" class="hidden mt-6 text-center">
+            <div class="inline-flex items-center gap-3 glass-panel px-6 py-4 rounded-2xl">
+                <div class="w-4 h-4 border-2 border-blue-400 border-t-blue-600 rounded-full animate-spin"></div>
+                <span class="text-sm font-semibold text-gray-700 dark:text-gray-200">Processing...</span>
+            </div>
+        </div>
+        <div id="assistantError" class="hidden mt-6 p-4 bg-red-100/90 dark:bg-red-900/50 text-red-700 dark:text-red-200 rounded-2xl border border-red-200 dark:border-red-800 text-sm font-medium"></div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        
+        function toggleTheme() {
+            const html = document.documentElement;
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+
+        let mcqData = [], currentQuestionIndex = 0, userAnswers = {}, skippedQuestions = new Set(), quizStartTime = null;
+        let timerInterval, constructionProgressInterval;
+        
+        const screens = { 
+            setup: document.getElementById('setupScreen'), 
+            quiz: document.getElementById('quizArena'), 
+            review: document.getElementById('reviewScreen'),
+            subjectiveSetup: document.getElementById('subjectiveSetupScreen'),
+            subjectiveQuiz: document.getElementById('subjectiveQuizArena'),
+            subjectiveReview: document.getElementById('subjectiveReviewScreen'),
+            assistant: document.getElementById('assistantScreen')
+        };
+        const els = { 
+            backendUrl: document.getElementById('backendUrl'), 
+            apiKey: document.getElementById('apiKey'), 
+            content: document.getElementById('content'), 
+            difficulty: document.getElementById('difficulty'), 
+            maxQuestions: document.getElementById('maxQuestions'), 
+            quizTimerInput: document.getElementById('quizTimerInput'),
+            generateBtn: document.getElementById('generateBtn'), 
+            loading: document.getElementById('loading'), 
+            error: document.getElementById('error'), 
+            questionCounter: document.getElementById('questionCounter'), 
+            questionText: document.getElementById('questionText'), 
+            optionsContainer: document.getElementById('optionsContainer'), 
+            nextBtn: document.getElementById('nextBtn'), 
+            prevBtn: document.getElementById('prevBtn'),
+            resultModal: document.getElementById('resultModal'), 
+            modalScore: document.getElementById('modalScore'), 
+            masteryLevel: document.getElementById('masteryLevel'),
+            reviewList: document.getElementById('reviewList'),
+            progressBar: document.getElementById('progressBar'),
+            progressText: document.getElementById('progressText'),
+            timerDisplay: document.getElementById('timerDisplay'),
+            timerText: document.getElementById('timerText'),
+            historyList: document.getElementById('historyList'),
+            providerBadge: document.getElementById('providerBadge'),
+            constructionProgressBar: document.getElementById('constructionProgressBar'),
+            statsScore: document.getElementById('statsScore'),
+            statsAccuracy: document.getElementById('statsAccuracy'),
+            statsTime: document.getElementById('statsTime'),
+            statsAttempted: document.getElementById('statsAttempted'),
+            constructionPercentage: document.getElementById('constructionPercentage'),
+            subjectiveHistoryList: document.getElementById('subjectiveHistoryList')
+        };
+
+        // Load history on startup
+        loadHistory();
+
+        // ========== MODE DROPDOWN FUNCTIONS ==========
+        function toggleModeDropdown() {
+            const dropdown = document.getElementById('modeDropdown');
+            const chevron = document.getElementById('chevronIcon');
+            dropdown.classList.toggle('hidden');
+            chevron.classList.toggle('rotate-180');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('modeDropdown');
+            const btn = document.getElementById('modeDropdownBtn');
+            if (!btn.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.add('hidden');
+                document.getElementById('chevronIcon').classList.remove('rotate-180');
+            }
+        });
+
+        // ========== SUBJECTIVE QUESTIONS FUNCTIONS ==========
+        let currentMode = 'mcq', subjectiveData = [], subjectiveAnswers = {};
+        
+        const modeLabels = {
+            'mcq': 'MCQ Questions',
+            'subjective': 'Subjective (10-Mark)',
+            'assistant': 'AI Study Assistant'
+        };
+        
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // Update dropdown button text
+            document.getElementById('currentModeText').textContent = modeLabels[mode];
+            
+            // Hide all screens
+            document.getElementById('setupScreen').classList.add('hidden');
+            document.getElementById('subjectiveSetupScreen').classList.add('hidden');
+            document.getElementById('assistantScreen').classList.add('hidden');
+            
+            // Show selected screen
+            if (mode === 'mcq') {
+                document.getElementById('setupScreen').classList.remove('hidden');
+            } else if (mode === 'subjective') {
+                document.getElementById('subjectiveSetupScreen').classList.remove('hidden');
+                loadSubjectiveHistory();
+            } else if (mode === 'assistant') {
+                document.getElementById('assistantScreen').classList.remove('hidden');
+                lucide.createIcons();
+            }
+        }
+
+        async function generateSubjectiveQuestions() {
+            const content = document.getElementById('subjectiveContent').value.trim();
+            const questionCount = parseInt(document.getElementById('subjectiveQuestionCount').value);
+            const difficulty = document.getElementById('subjectiveDifficulty').value;
+            const apiKey = document.getElementById('subjectiveApiKey').value.trim();
+            const backendUrl = document.getElementById('subjectiveBackendUrl').value.trim();
+            
+            if (!content) {
+                showSubjectiveError('Please enter topics or content');
+                return;
+            }
+            if (!apiKey) {
+                showSubjectiveError('Please enter your API Key');
+                return;
+            }
+
+            document.getElementById('subjectiveLoading').classList.remove('hidden');
+            document.getElementById('subjectiveError').classList.add('hidden');
+            let progress = 0;
+            
+            const progressInterval = setInterval(() => {
+                progress = Math.min(progress + Math.random() * 30, 90);
+                document.getElementById('subjectiveProgressBar').style.width = progress + '%';
+                document.getElementById('subjectiveProgressPercentage').textContent = Math.floor(progress) + '%';
+            }, 300);
+
+            try {
+                const response = await fetch(backendUrl + '/generate-questions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        content,
+                        numQuestions: questionCount,
+                        difficulty,
+                        questionType: 'subjective',
+                        apiKey
+                    })
+                });
+
+                clearInterval(progressInterval);
+                document.getElementById('subjectiveProgressBar').style.width = '100%';
+                document.getElementById('subjectiveProgressPercentage').textContent = '100%';
+
+                if (!response.ok) {
+                    const error = await response.json().catch(() => ({}));
+                    throw new Error(error.message || 'Failed to generate questions');
+                }
+                
+                subjectiveData = await response.json();
+                subjectiveAnswers = {};
+                currentQuestionIndex = 0;
+                
+                setTimeout(() => {
+                    document.getElementById('subjectiveLoading').classList.add('hidden');
+                    document.getElementById('subjectiveSetupScreen').classList.add('hidden');
+                    document.getElementById('subjectiveQuizArena').classList.remove('hidden');
+                    showSubjectiveQuestion();
+                    lucide.createIcons();
+                }, 500);
+            } catch (err) {
+                clearInterval(progressInterval);
+                showSubjectiveError(err.message || 'Error generating questions');
+                document.getElementById('subjectiveLoading').classList.add('hidden');
+            }
+        }
+
+        function detectSubjectiveProvider() {
+            const apiKey = document.getElementById('subjectiveApiKey').value.trim();
+            let provider = 'Detecting...', bgColor = 'bg-gray-200', textColor = 'text-gray-500';
+            
+            if (apiKey.startsWith('AIza')) { provider = 'Gemini'; bgColor = 'bg-blue-200'; textColor = 'text-blue-700'; }
+            else if (apiKey.startsWith('gsk_')) { provider = 'Groq'; bgColor = 'bg-green-200'; textColor = 'text-green-700'; }
+            else if (apiKey.startsWith('sk-')) { provider = 'OpenAI'; bgColor = 'bg-orange-200'; textColor = 'text-orange-700'; }
+            
+            const badge = document.getElementById('subjectiveProviderBadge');
+            badge.textContent = provider;
+            badge.className = `text-[10px] font-black uppercase px-2 py-0.5 rounded-md ${bgColor} ${textColor} transition-all duration-300`;
+        }
+
+        function showSubjectiveQuestion() {
+            if (currentQuestionIndex >= subjectiveData.length) {
+                showSubjectiveReview();
+                return;
+            }
+
+            const q = subjectiveData[currentQuestionIndex];
+            document.getElementById('subjectiveQuestionCounter').textContent = `Question ${currentQuestionIndex + 1} of ${subjectiveData.length}`;
+            document.getElementById('subjectiveQuestionText').textContent = q.question;
+            document.getElementById('questionMarks').textContent = `${q.marks || 10} Mark${(q.marks || 10) !== 1 ? 's' : ''}`;
+            document.getElementById('subjectiveAnswerInput').value = subjectiveAnswers[currentQuestionIndex] || '';
+            
+            const progressPercent = ((currentQuestionIndex + 1) / subjectiveData.length) * 100;
+            document.getElementById('subjectiveProgressBarQuiz').style.width = progressPercent + '%';
+            document.getElementById('subjectiveProgressText').textContent = Math.round(progressPercent) + '%';
+
+            document.getElementById('subjectivePrevBtn').classList.toggle('hidden', currentQuestionIndex === 0);
+            document.getElementById('subjectiveNextBtn').textContent = currentQuestionIndex === subjectiveData.length - 1 ? 'Submit' : 'Next';
+            document.getElementById('subjectiveNextBtn').innerHTML = currentQuestionIndex === subjectiveData.length - 1 
+                ? '<i data-lucide="check" class="w-5 h-5"></i> Submit' 
+                : 'Next <i data-lucide="arrow-right" class="w-5 h-5"></i>';
+
+            updateWordCount();
+            lucide.createIcons();
+        }
+
+        function updateWordCount() {
+            const text = document.getElementById('subjectiveAnswerInput').value;
+            const wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            document.getElementById('wordCount').textContent = wordCount;
+        }
+
+        function subjectiveNextQuestion() {
+            subjectiveAnswers[currentQuestionIndex] = document.getElementById('subjectiveAnswerInput').value;
+            
+            if (currentQuestionIndex < subjectiveData.length - 1) {
+                currentQuestionIndex++;
+                showSubjectiveQuestion();
+            } else {
+                showSubjectiveReview();
+            }
+        }
+
+        function subjectivePrevQuestion() {
+            subjectiveAnswers[currentQuestionIndex] = document.getElementById('subjectiveAnswerInput').value;
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showSubjectiveQuestion();
+            }
+        }
+
+        function showSubjectiveReview() {
+            document.getElementById('subjectiveQuizArena').classList.add('hidden');
+            document.getElementById('subjectiveReviewScreen').classList.remove('hidden');
+
+            let totalMarks = 0;
+            subjectiveData.forEach(q => {
+                totalMarks += (q.marks || 10);
+            });
+
+            // Save to subjective quiz history
+            const now = new Date();
+            const date = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+            const historyEntry = {
+                date: date,
+                questionCount: subjectiveData.length,
+                totalMarks: totalMarks,
+                marksObtained: 0,  // Teacher will manually grade
+                answers: subjectiveAnswers,
+                quizData: subjectiveData
+            };
+
+            const history = JSON.parse(localStorage.getItem('subjectiveQuizHistory') || '[]');
+            history.push(historyEntry);
+            localStorage.setItem('subjectiveQuizHistory', JSON.stringify(history));
+            loadSubjectiveHistory();
+
+            document.getElementById('subjectiveTotalMarks').textContent = `0 / ${totalMarks}`;
+
+            const reviewList = document.getElementById('subjectiveReviewList');
+            reviewList.innerHTML = '';
+
+            subjectiveData.forEach((q, idx) => {
+                const userAnswer = subjectiveAnswers[idx] || '(No Answer)';
+                const marks = q.marks || 10;
+                const card = document.createElement('div');
+                card.className = "glass-panel p-6 rounded-3xl mb-6";
+                card.innerHTML = `
+                    <div class="flex items-start gap-4 mb-4">
+                        <span class="bg-amber-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg">Q${idx+1}</span>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">${q.question}</h3>
+                        </div>
+                    </div>
+                    <div class="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-2xl mb-4 border border-blue-200 dark:border-blue-800">
+                        <p class="text-xs font-bold uppercase tracking-widest text-blue-900 dark:text-blue-300 mb-2">Your Answer</p>
+                        <p class="text-gray-900 dark:text-white whitespace-pre-wrap leading-relaxed">${userAnswer}</p>
+                    </div>
+                    <div class="bg-green-50 dark:bg-green-900/30 p-4 rounded-2xl border border-green-200 dark:border-green-800">
+                        <p class="text-xs font-bold uppercase tracking-widest text-green-900 dark:text-green-300 mb-2">Expected Answer</p>
+                        <p class="text-gray-900 dark:text-white whitespace-pre-wrap leading-relaxed">${q.answer || 'Model answer not available'}</p>
+                    </div>
+                `;
+                reviewList.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function showSubjectiveError(msg) {
+            document.getElementById('subjectiveError').textContent = msg;
+            document.getElementById('subjectiveError').classList.toggle('hidden', !msg);
+        }
+
+        // Update word count on input
+        document.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('subjectiveAnswerInput')) {
+                document.getElementById('subjectiveAnswerInput').addEventListener('input', updateWordCount);
+            }
+        });
+        detectProvider(); // Initial check
+
+        function detectProvider() {
+            const key = els.apiKey.value.trim();
+            const badge = els.providerBadge;
+            
+            if (!key) {
+                badge.textContent = "No Key";
+                badge.className = "text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-gray-200 text-gray-500";
+                return;
+            }
+
+            if (key.startsWith("gsk_")) {
+                badge.textContent = "Groq (Speed)";
+                badge.className = "text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-blue-100 text-blue-600";
+            } else if (key.startsWith("sk-")) {
+                badge.textContent = "OpenAI (Quota issues)";
+                badge.className = "text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-red-100 text-red-600";
+            } else if (key.startsWith("AIza")) {
+                badge.textContent = "Google Gemini";
+                badge.className = "text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-fuchsia-100 text-fuchsia-600";
+            } else {
+                badge.textContent = "Unknown";
+                badge.className = "text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-orange-100 text-orange-600";
+            }
+        }
+
+        function startConstructionProgress() {
+            let progress = 0;
+            const targetReach = 99;
+            const duration = 45000; // 45 seconds to reach 99%
+            const startTime = Date.now();
+
+            // Clear any existing interval
+            if (constructionProgressInterval) clearInterval(constructionProgressInterval);
+
+            constructionProgressInterval = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const easedProgress = Math.min((elapsed / duration) * targetReach, targetReach);
+                
+                // Add some randomness for more natural feel
+                progress = Math.floor(easedProgress + Math.random() * 2);
+                progress = Math.min(progress, 98);
+
+                els.constructionProgressBar.style.width = `${progress}%`;
+                els.constructionPercentage.textContent = `${progress}%`;
+            }, 200);
+        }
+
+        function completeConstructionProgress() {
+            if (constructionProgressInterval) clearInterval(constructionProgressInterval);
+            els.constructionProgressBar.style.width = `100%`;
+            els.constructionPercentage.textContent = `100%`;
+        }
+
+        async function generateQuiz() {
+            const url = els.backendUrl.value.replace(/\/+$/, '') + '/generate-mcq';
+            const rawKey = els.apiKey.value.trim();
+            const text = els.content.value;
+            
+            if (!url || !rawKey || !text) return showError("Please provide your API key and learning material.");
+
+            // Auto-Detect Provider based on Key Prefix
+            let provider = "gemini"; // fallback
+            if (rawKey.startsWith("gsk_")) provider = "groq";
+            else if (rawKey.startsWith("sk-")) provider = "openai";
+            else if (rawKey.startsWith("AIza")) provider = "gemini";
+
+            showError(null); 
+            els.generateBtn.disabled = true; 
+            els.loading.classList.remove('hidden');
+            
+            // Reset and start progress animation
+            els.constructionProgressBar.style.width = `0%`;
+            els.constructionPercentage.textContent = `0%`;
+            startConstructionProgress();
+            
+            try {
+                let maxQ = parseInt(els.maxQuestions.value, 10);
+                if (isNaN(maxQ) || maxQ <= 0) maxQ = undefined;
+
+                const payload = { content: text, api_key: rawKey, provider: provider, difficulty: els.difficulty.value };
+                if (typeof maxQ !== 'undefined') payload.max_questions = maxQ;
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail || "Failed to generate.");
+                
+                // Complete the progress animation
+                completeConstructionProgress();
+                mcqData = data; 
+                startQuiz();
+            } catch (err) { 
+                completeConstructionProgress();
+                showError(err.message); 
+                els.generateBtn.disabled = false; 
+            } finally { 
+                els.loading.classList.add('hidden'); 
+            }
+        }
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            userAnswers = {};
+            skippedQuestions = new Set();
+            quizStartTime = Date.now(); // Track when quiz started
+            
+            // Timer Logic
+            clearInterval(timerInterval);
+            const minutes = parseInt(els.quizTimerInput.value);
+            if (!isNaN(minutes) && minutes > 0) {
+                let timeRemaining = minutes * 60;
+                els.timerDisplay.classList.remove('bg-gray-500/60');
+                els.timerDisplay.classList.add('bg-red-500/90', 'animate-pulse');
+                updateTimerDisplay(timeRemaining);
+                timerInterval = setInterval(() => {
+                    timeRemaining--;
+                    updateTimerDisplay(timeRemaining);
+                    if (timeRemaining <= 0) {
+                        clearInterval(timerInterval);
+                        alert("Time's up! Submitting quiz.");
+                        submitQuiz(); // Auto submit
+                    }
+                }, 1000);
+            } else {
+                els.timerDisplay.classList.remove('bg-red-500/90', 'animate-pulse');
+                els.timerDisplay.classList.add('bg-gray-500/60');
+                els.timerText.textContent = 'No Time Limit';
+            }
+
+            switchScreen('quiz'); 
+            renderQuestion(); 
+        }
+
+        function updateTimerDisplay(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            els.timerText.textContent = `${m}:${s}`;
+            lucide.createIcons();
+        }
+
+        function renderQuestion() {
+            const progress = ((currentQuestionIndex) / mcqData.length) * 100;
+            els.progressBar.style.width = `${progress}%`;
+            els.progressText.textContent = `${Math.round(progress)}%`;
+
+            const q = mcqData[currentQuestionIndex];
+            els.questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${mcqData.length}`;
+            els.questionText.textContent = q.question;
+            els.optionsContainer.innerHTML = '';
+            
+            ['A', 'B', 'C', 'D'].forEach((label, index) => {
+                const btn = document.createElement('div');
+                btn.className = `option-card group flex items-center p-5 rounded-2xl cursor-pointer select-none animate-enter`;
+                btn.style.animationDelay = `${index * 50}ms`;
+                btn.onclick = () => selectOption(label);
+                
+                // Check if already answered
+                if (userAnswers[currentQuestionIndex] === label) btn.classList.add('selected');
+                
+                btn.innerHTML = `
+                    <div class="option-letter w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl bg-gray-300 text-black dark:bg-gray-700 dark:text-white font-bold text-lg mr-5 transition-all duration-300 group-hover:bg-gray-400 dark:group-hover:bg-gray-600 group-hover:text-black dark:group-hover:text-white shadow-sm">
+                        ${label}
+                    </div>
+                    <span class="font-medium text-lg leading-snug text-black dark:text-white group-hover:text-black dark:group-hover:text-white transition-colors">${q.options[label]}</span>
+                    <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                         <i data-lucide="check-circle-2" class="w-5 h-5 text-fuchsia-400"></i>
+                    </div>
+                `;
+                btn.dataset.value = label;
+                els.optionsContainer.appendChild(btn);
+            });
+            
+            const isLast = currentQuestionIndex === mcqData.length - 1;
+            
+            // Button Logic
+            els.prevBtn.classList.toggle('hidden', currentQuestionIndex === 0);
+            
+            els.nextBtn.innerHTML = isLast ? `Submit Quiz <i data-lucide="check-circle" class="w-5 h-5 inline ml-1"></i>` : `Next <i data-lucide="arrow-right" class="w-5 h-5 inline ml-1"></i>`;
+            els.nextBtn.onclick = isLast ? submitQuiz : nextQuestion;
+            
+            // If answer already exists (when going back), enable next
+            els.nextBtn.disabled = !userAnswers[currentQuestionIndex];
+            
+            lucide.createIcons();
+        }
+        
+        function selectOption(label) {
+            userAnswers[currentQuestionIndex] = label;
+            Array.from(els.optionsContainer.children).forEach(opt => opt.classList.toggle('selected', opt.dataset.value === label));
+            els.nextBtn.disabled = false;
+        }
+
+        function nextQuestion() {
+            if (!userAnswers[currentQuestionIndex]) return alert("Select an answer first.");
+            currentQuestionIndex++;
+            renderQuestion();
+        }
+
+        function skipQuestion() {
+            skippedQuestions.add(currentQuestionIndex);
+            currentQuestionIndex++;
+            renderQuestion();
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        }
+
+        function submitQuiz() {
+            if (timerInterval && els.timerText.textContent.includes("00:00")) {
+                // Auto submit logic pass
+            } else if (!userAnswers[currentQuestionIndex]) {
+                 return alert("Select an answer first.");
+            }
+
+            clearInterval(timerInterval); // Stop timer
+
+            els.progressBar.style.width = `100%`;
+            els.progressText.textContent = `100%`;
+
+            let score = 0;
+            mcqData.forEach((q, idx) => { if (userAnswers[idx] === q.answer) score++; });
+            const percentage = Math.round((score / mcqData.length) * 100);
+
+            // Mastery Logic
+            let mastery = { text: "Needs Improvement", color: "text-red-500" };
+            if (percentage >= 80) mastery = { text: "Excellent!", color: "text-green-500" };
+            else if (percentage >= 60) mastery = { text: "Good Job", color: "text-yellow-500" };
+
+            els.modalScore.textContent = `${percentage}%`;
+            els.masteryLevel.textContent = mastery.text;
+            els.masteryLevel.className = `text-lg font-bold mb-6 tracking-wide uppercase ${mastery.color}`;
+
+            els.resultModal.classList.remove('hidden');
+
+            // Save to History - MUST save quiz data here
+            const timeTaken = quizStartTime ? Date.now() - quizStartTime : 0;
+            const timeLimit = parseInt(els.quizTimerInput.value) || 0;
+            saveHistory(score, mcqData.length, percentage, mastery.text, JSON.parse(JSON.stringify(mcqData)), JSON.parse(JSON.stringify(userAnswers)), timeTaken, timeLimit);
+
+            if (percentage > 50) triggerConfetti();
+        }
+
+        function saveHistory(score, total, percentage, mastery, quizDataToSave, userAnswersToSave, timeTaken, timeLimit) {
+            try {
+                let history = JSON.parse(localStorage.getItem('quizHistory') || '[]');
+                const newEntry = {
+                    id: Date.now(),
+                    date: new Date().toLocaleDateString(),
+                    score: score,
+                    total: total,
+                    percentage: percentage,
+                    mastery: mastery,
+                    quizData: quizDataToSave || mcqData,
+                    userAnswers: userAnswersToSave || userAnswers,
+                    timeTaken: timeTaken || 0,
+                    timeLimit: timeLimit || 0
+                };
+                history.unshift(newEntry);
+                if (history.length > 10) history.pop();
+                localStorage.setItem('quizHistory', JSON.stringify(history));
+                loadHistory();
+            } catch (e) {
+                console.error('Error saving history:', e);
+            }
+        }
+
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('quizHistory') || '[]');
+            els.historyList.innerHTML = '';
+
+            if (history.length === 0) {
+                els.historyList.innerHTML = '<div class="text-sm text-gray-500 dark:text-gray-400 text-center py-2">No quiz history found.</div>';
+                return;
+            }
+
+            history.forEach(h => {
+                let borderClass = 'average';
+                if (h.percentage >= 80) borderClass = 'excellent';
+                else if (h.percentage >= 60) borderClass = 'good';
+
+                const div = document.createElement('div');
+                div.className = `history-item ${borderClass} bg-white/50 dark:bg-black/20 p-3 rounded-r-lg flex justify-between items-center cursor-pointer hover:bg-white/80 dark:hover:bg-black/40 transition-colors`;
+                div.onclick = () => viewHistoryReview(h);
+                div.innerHTML = `
+                    <div>
+                        <div class="text-xs text-gray-400 font-bold uppercase">${h.date}</div>
+                        <div class="font-bold text-gray-700 dark:text-gray-200">${h.mastery}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xl font-black text-black dark:text-white">${h.percentage}%</div>
+                        <div class="text-xs text-gray-500">${h.score}/${h.total}</div>
+                    </div>
+                `;
+                els.historyList.appendChild(div);
+            });
+        }
+
+        function loadSubjectiveHistory() {
+            const history = JSON.parse(localStorage.getItem('subjectiveQuizHistory') || '[]');
+            if (!els.subjectiveHistoryList) return;
+            els.subjectiveHistoryList.innerHTML = '';
+
+            if (history.length === 0) {
+                els.subjectiveHistoryList.innerHTML = '<div class="text-sm text-gray-500 dark:text-gray-400 text-center py-2">No quiz history found.</div>';
+                return;
+            }
+
+            history.forEach(h => {
+                let scorePercent = h.totalMarks > 0 ? Math.round((h.marksObtained / h.totalMarks) * 100) : 0;
+                let borderClass = 'average';
+                if (scorePercent >= 80) borderClass = 'excellent';
+                else if (scorePercent >= 60) borderClass = 'good';
+
+                const div = document.createElement('div');
+                div.className = `history-item ${borderClass} bg-white/50 dark:bg-black/20 p-3 rounded-r-lg flex justify-between items-center cursor-pointer hover:bg-white/80 dark:hover:bg-black/40 transition-colors`;
+                div.innerHTML = `
+                    <div>
+                        <div class="text-xs text-gray-400 font-bold uppercase">${h.date}</div>
+                        <div class="font-bold text-gray-700 dark:text-gray-200">${h.questionCount} Questions</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xl font-black text-black dark:text-white">${scorePercent}%</div>
+                        <div class="text-xs text-gray-500">${h.marksObtained}/${h.totalMarks}</div>
+                    </div>
+                `;
+                els.subjectiveHistoryList.appendChild(div);
+            });
+        }
+
+        function triggerConfetti() {
+            const count = 200;
+            const defaults = { origin: { y: 0.7 } };
+            function fire(particleRatio, opts) {
+                confetti(Object.assign({}, defaults, opts, { particleCount: Math.floor(count * particleRatio) }));
+            }
+            fire(0.25, { spread: 26, startVelocity: 55, colors: ['#333333', '#666666'] });
+            fire(0.2, { spread: 60 });
+            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+            fire(0.1, { spread: 120, startVelocity: 45 });
+        }
+        
+        function showReview() {
+            els.resultModal.classList.add('hidden'); switchScreen('review'); els.reviewList.innerHTML = ''; let score = 0;
+            mcqData.forEach((q, idx) => {
+                const userChoice = userAnswers[idx], isCorrect = userChoice === q.answer, isSkipped = skippedQuestions.has(idx);
+                if (isCorrect) score++;
+                let optionsHtml = ''; ['A', 'B', 'C', 'D'].forEach(label => {
+                    let styles = "border-transparent bg-gray-50/50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400", icon = "";
+                    if (label === q.answer) { styles = "border-green-200 bg-green-50/80 dark:bg-green-900/40 text-green-700 dark:text-green-300 shadow-sm"; icon = `<i data-lucide="check-circle" class="w-5 h-5 text-green-600 ml-auto"></i>`; }
+                    else if (label === userChoice && !isCorrect) { styles = "border-red-200 bg-red-50/80 dark:bg-red-900/40 text-red-700 dark:text-red-300 shadow-sm"; icon = `<i data-lucide="x-circle" class="w-5 h-5 text-red-600 ml-auto"></i>`; }
+                    optionsHtml += `<div class="flex items-center p-3 rounded-xl border ${styles} mb-2 transition-colors"><span class="font-bold mr-4 w-6 text-center">${label}</span><span class="font-medium">${q.options[label]}</span>${icon}</div>`;
+                });
+                const card = document.createElement('div'); card.className = "glass-panel p-6 rounded-3xl mb-6 relative overflow-hidden";
+                const skippedBadge = isSkipped ? `<span class="bg-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg">SKIPPED</span>` : '';
+                card.innerHTML = `
+                    <div class="flex items-start gap-4 mb-5 relative z-10">
+                        <span class="bg-gray-900 dark:bg-gray-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg mt-1">Q${idx+1}</span>
+                        <h3 class="text-xl font-bold leading-snug text-gray-900 dark:text-gray-100">${q.question}</h3>
+                        ${skippedBadge}
+                    </div>
+                    <div class="space-y-1 mb-5 relative z-10">${isSkipped ? '<p class="text-orange-600 dark:text-orange-400 font-semibold mb-3">This question was skipped</p>' : optionsHtml}</div>
+                    <div class="bg-blue-50/80 dark:bg-blue-900/30 backdrop-blur-sm p-5 rounded-2xl text-sm text-blue-900 dark:text-blue-200 border border-blue-100 dark:border-blue-800 flex gap-3 relative z-10">
+                        <i data-lucide="info" class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"></i>
+                        <div><span class="font-bold uppercase text-xs tracking-wider block mb-1 text-blue-500 dark:text-blue-400">Explanation</span>${q.explanation}</div>
+                    </div>
+                `;
+                els.reviewList.appendChild(card);
+            });
+
+            // Calculate stats
+            const attempted = Object.keys(userAnswers).length;
+            const accuracy = mcqData.length > 0 ? Math.round((score / mcqData.length) * 100) : 0;
+            const timeTaken = quizStartTime ? Math.floor((Date.now() - quizStartTime) / 1000 / 60) : 0; // in minutes
+            const timeLimit = parseInt(els.quizTimerInput.value) || 0; // Get time limit from input
+            const timeDisplay = timeLimit > 0 ? `${timeTaken}/${timeLimit} m` : `${timeTaken}m`;
+
+            // Update stat cards
+            els.statsScore.textContent = `${score}/${mcqData.length}`;
+            els.statsAccuracy.textContent = `${accuracy}%`;
+            els.statsTime.textContent = timeDisplay;
+            els.statsAttempted.textContent = `${attempted}/${mcqData.length}`;
+
+            lucide.createIcons();
+        }
+
+        function viewHistoryReview(historyEntry) {
+            mcqData = historyEntry.quizData;
+            userAnswers = historyEntry.userAnswers;
+            skippedQuestions = new Set();
+            switchScreen('review');
+            els.reviewList.innerHTML = '';
+            let score = 0;
+
+            mcqData.forEach((q, idx) => {
+                const userChoice = userAnswers[idx], isCorrect = userChoice === q.answer;
+                if (isCorrect) score++;
+                let optionsHtml = '';
+                ['A', 'B', 'C', 'D'].forEach(label => {
+                    let styles = "border-transparent bg-gray-50/50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400", icon = "";
+                    if (label === q.answer) { styles = "border-green-200 bg-green-50/80 dark:bg-green-900/40 text-green-700 dark:text-green-300 shadow-sm"; icon = `<i data-lucide="check-circle" class="w-5 h-5 text-green-600 ml-auto"></i>`; }
+                    else if (label === userChoice && !isCorrect) { styles = "border-red-200 bg-red-50/80 dark:bg-red-900/40 text-red-700 dark:text-red-300 shadow-sm"; icon = `<i data-lucide="x-circle" class="w-5 h-5 text-red-600 ml-auto"></i>`; }
+                    optionsHtml += `<div class="flex items-center p-3 rounded-xl border ${styles} mb-2 transition-colors"><span class="font-bold mr-4 w-6 text-center">${label}</span><span class="font-medium">${q.options[label]}</span>${icon}</div>`;
+                });
+                const card = document.createElement('div');
+                card.className = "glass-panel p-6 rounded-3xl mb-6 relative overflow-hidden";
+                card.innerHTML = `
+                    <div class="flex items-start gap-4 mb-5 relative z-10">
+                        <span class="bg-gray-900 dark:bg-gray-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg mt-1">Q${idx+1}</span>
+                        <h3 class="text-xl font-bold leading-snug text-black dark:text-white">${q.question}</h3>
+                    </div>
+                    <div class="space-y-1 mb-5 relative z-10">${optionsHtml}</div>
+                    <div class="bg-blue-50/80 dark:bg-blue-900/30 backdrop-blur-sm p-5 rounded-2xl text-sm text-blue-900 dark:text-blue-200 border border-blue-100 dark:border-blue-800 flex gap-3 relative z-10">
+                        <i data-lucide="info" class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"></i>
+                        <div><span class="font-bold uppercase text-xs tracking-wider block mb-1 text-blue-500 dark:text-blue-400">Explanation</span>${q.explanation}</div>
+                    </div>
+                `;
+                els.reviewList.appendChild(card);
+            });
+            
+            // Calculate stats for history review
+            const attempted = Object.keys(userAnswers).length;
+            const accuracy = mcqData.length > 0 ? Math.round((score / mcqData.length) * 100) : 0;
+            const timeTaken = historyEntry.timeTaken ? Math.floor(historyEntry.timeTaken / 1000 / 60) : 0; // in minutes
+            const timeLimit = historyEntry.timeLimit || 0;
+            const timeDisplay = timeLimit > 0 ? `${timeTaken}/${timeLimit} m` : `${timeTaken}m`;
+
+            els.statsScore.textContent = `${score}/${mcqData.length}`;
+            els.statsAccuracy.textContent = `${accuracy}%`;
+            els.statsTime.textContent = timeDisplay;
+            els.statsAttempted.textContent = `${attempted}/${mcqData.length}`;
+
+            lucide.createIcons();
+        }
+
+        function switchScreen(name) { Object.values(screens).forEach(s => s.classList.add('hidden')); screens[name].classList.remove('hidden'); window.scrollTo(0,0); }
+        
+        function resetSubjective() {
+            // Reset subjective quiz state
+            subjectiveData = [];
+            subjectiveAnswers = {};
+            currentQuestionIndex = 0;
+            
+            // Hide review screen, show setup screen
+            document.getElementById('subjectiveReviewScreen').classList.add('hidden');
+            document.getElementById('subjectiveSetupScreen').classList.remove('hidden');
+            document.getElementById('subjectiveQuizArena').classList.add('hidden');
+        }
+
+        function resetApp() { 
+            clearInterval(timerInterval); 
+            els.resultModal.classList.add('hidden'); 
+            els.generateBtn.disabled = false; 
+            switchScreen('setup'); 
+        }
+        
+        function showError(msg) { els.error.textContent = msg; els.error.classList.toggle('hidden', !msg); }
+
+        // ========== AI STUDY ASSISTANT FUNCTIONS ==========
+        let assistantChatHistory = [];
+        let currentAssistantProvider = 'none';
+
+        function detectAssistantProvider() {
+            const key = document.getElementById('assistantApiKey').value.trim();
+            let provider = 'No Key';
+            if (key.startsWith('AIza')) provider = 'Gemini';
+            else if (key.startsWith('sk-')) provider = 'OpenAI';
+            else if (key.startsWith('gsk_')) provider = 'Groq';
+            currentAssistantProvider = provider.toLowerCase();
+            document.getElementById('assistantProviderBadge').textContent = provider;
+        }
+
+        function showAssistantError(msg) {
+            const errorDiv = document.getElementById('assistantError');
+            errorDiv.textContent = msg;
+            errorDiv.classList.remove('hidden');
+            setTimeout(() => errorDiv.classList.add('hidden'), 5000);
+        }
+
+        async function sendAssistantMessage() {
+            const input = document.getElementById('assistantInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            const apiKey = document.getElementById('assistantApiKey').value.trim();
+            if (!apiKey) {
+                showAssistantError('Please enter your API key');
+                return;
+            }
+
+            // Add user message to chat
+            const chatBox = document.getElementById('assistantChatBox');
+            const userMsgDiv = document.createElement('div');
+            userMsgDiv.className = 'flex justify-end mb-2';
+            userMsgDiv.innerHTML = `<div class="bg-blue-500 text-white p-3 rounded-2xl max-w-xs text-sm">${msg}</div>`;
+            chatBox.appendChild(userMsgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            input.value = '';
+
+            // Show loading
+            document.getElementById('assistantLoading').classList.remove('hidden');
+
+            // Prepare system prompt
+            const level = document.getElementById('assistantLevel').value;
+            const systemPrompt = `You are an expert study tutor at ${level} level. Help the student understand concepts, answer questions, and provide study guidance. Be clear, concise, and encouraging.`;
+
+            try {
+                const response = await fetch('http://localhost:3000/api/assistant-chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: msg,
+                        history: assistantChatHistory,
+                        api_key: apiKey,
+                        provider: currentAssistantProvider,
+                        systemPrompt: systemPrompt
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Failed to get response');
+                }
+
+                // Add assistant response
+                const assistantMsgDiv = document.createElement('div');
+                assistantMsgDiv.className = 'flex justify-start mb-2';
+                assistantMsgDiv.innerHTML = `<div class="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white p-3 rounded-2xl max-w-xs text-sm">${data.response}</div>`;
+                chatBox.appendChild(assistantMsgDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                assistantChatHistory.push({ user: msg, assistant: data.response });
+
+            } catch (err) {
+                showAssistantError('Error: ' + (err.message || 'Failed to get response'));
+                console.error(err);
+            } finally {
+                document.getElementById('assistantLoading').classList.add('hidden');
+            }
+        }
+
+        function handleAssistantKeypress(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendAssistantMessage();
+            }
+        }
+
+        async function generateStudyGuide() {
+            const topics = document.getElementById('studyTopics').value.trim();
+            if (!topics) {
+                showAssistantError('Please enter topics');
+                return;
+            }
+
+            const apiKey = document.getElementById('assistantApiKey').value.trim();
+            if (!apiKey) {
+                showAssistantError('Please enter your API key');
+                return;
+            }
+
+            document.getElementById('assistantLoading').classList.remove('hidden');
+
+            const prompt = `Create a comprehensive study guide for the following topics at ${document.getElementById('assistantLevel').value} level. Include key concepts, examples, and practice tips:\n\n${topics}`;
+
+            try {
+                const response = await fetch('http://localhost:3000/api/assistant-generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        api_key: apiKey,
+                        provider: currentAssistantProvider
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail);
+
+                // Display guide in chat
+                const chatBox = document.getElementById('assistantChatBox');
+                const guideDiv = document.createElement('div');
+                guideDiv.className = 'bg-amber-50 dark:bg-amber-900/30 p-4 rounded-2xl border border-amber-200 dark:border-amber-800 text-sm text-gray-800 dark:text-gray-200';
+                guideDiv.innerHTML = `<strong>📚 Study Guide:</strong><br>${data.content}`;
+                chatBox.appendChild(guideDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            } catch (err) {
+                showAssistantError('Error: ' + (err.message || 'Failed to generate guide'));
+            } finally {
+                document.getElementById('assistantLoading').classList.add('hidden');
+            }
+        }
+
+        async function explainConcept() {
+            const concept = document.getElementById('conceptInput').value.trim();
+            if (!concept) {
+                showAssistantError('Please enter a concept');
+                return;
+            }
+
+            const apiKey = document.getElementById('assistantApiKey').value.trim();
+            if (!apiKey) {
+                showAssistantError('Please enter your API key');
+                return;
+            }
+
+            document.getElementById('assistantLoading').classList.remove('hidden');
+
+            const prompt = `Explain the concept of "${concept}" in simple terms suitable for ${document.getElementById('assistantLevel').value} level students. Include real-world examples and why it matters.`;
+
+            try {
+                const response = await fetch('http://localhost:3000/api/assistant-generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        api_key: apiKey,
+                        provider: currentAssistantProvider
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail);
+
+                // Display explanation in chat
+                const chatBox = document.getElementById('assistantChatBox');
+                const explainDiv = document.createElement('div');
+                explainDiv.className = 'bg-green-50 dark:bg-green-900/30 p-4 rounded-2xl border border-green-200 dark:border-green-800 text-sm text-gray-800 dark:text-gray-200';
+                explainDiv.innerHTML = `<strong>💡 Explanation:</strong><br>${data.content}`;
+                chatBox.appendChild(explainDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+                document.getElementById('conceptInput').value = '';
+            } catch (err) {
+                showAssistantError('Error: ' + (err.message || 'Failed to explain'));
+            } finally {
+                document.getElementById('assistantLoading').classList.add('hidden');
+            }
+        }
+
+        async function getQuestionHelp() {
+            const question = document.getElementById('questionText').value.trim();
+            if (!question) {
+                showAssistantError('Please enter a question');
+                return;
+            }
+
+            const apiKey = document.getElementById('assistantApiKey').value.trim();
+            if (!apiKey) {
+                showAssistantError('Please enter your API key');
+                return;
+            }
+
+            document.getElementById('assistantLoading').classList.remove('hidden');
+
+            const prompt = `Help the student solve this question. Don't give the direct answer, but guide them through the solution process:\n\n${question}`;
+
+            try {
+                const response = await fetch('http://localhost:3000/api/assistant-generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        api_key: apiKey,
+                        provider: currentAssistantProvider
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail);
+
+                // Display help in chat
+                const chatBox = document.getElementById('assistantChatBox');
+                const helpDiv = document.createElement('div');
+                helpDiv.className = 'bg-purple-50 dark:bg-purple-900/30 p-4 rounded-2xl border border-purple-200 dark:border-purple-800 text-sm text-gray-800 dark:text-gray-200';
+                helpDiv.innerHTML = `<strong>🤝 Solution Guide:</strong><br>${data.content}`;
+                chatBox.appendChild(helpDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+                document.getElementById('questionText').value = '';
+            } catch (err) {
+                showAssistantError('Error: ' + (err.message || 'Failed to get help'));
+            } finally {
+                document.getElementById('assistantLoading').classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
