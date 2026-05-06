@@ -267,14 +267,9 @@
                     <span class="font-semibold text-gray-800 dark:text-white">MCQ Questions</span>
                 </button>
                 <button onclick="switchMode('subjective'); toggleModeDropdown()" 
-                    class="w-full px-4 py-3 text-left hover:bg-blue-50 dark:hover:bg-slate-700 flex items-center gap-3 transition-colors border-b border-gray-100 dark:border-slate-700">
+                    class="w-full px-4 py-3 text-left hover:bg-blue-50 dark:hover:bg-slate-700 flex items-center gap-3 transition-colors">
                     <i data-lucide="file-text" class="w-5 h-5 text-amber-600"></i>
                     <span class="font-semibold text-gray-800 dark:text-white">Subjective (10-Mark)</span>
-                </button>
-                <button onclick="switchMode('assistant'); toggleModeDropdown()" 
-                    class="w-full px-4 py-3 text-left hover:bg-blue-50 dark:hover:bg-slate-700 flex items-center gap-3 transition-colors">
-                    <i data-lucide="sparkles" class="w-5 h-5 text-purple-600"></i>
-                    <span class="font-semibold text-gray-800 dark:text-white">AI Study Assistant</span>
                 </button>
             </div>
         </div>
@@ -731,113 +726,7 @@
         </div>
     </div>
 
-    <!-- AI STUDY ASSISTANT SCREEN -->
-    <div id="assistantScreen" class="hidden w-full max-w-5xl transition-all duration-300 animate-enter">
-        <div class="flex justify-between items-start mb-8">
-            <button onclick="switchMode('mcq')" class="btn-3d btn-secondary-3d px-4 py-2 font-bold flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200">
-                <i data-lucide="arrow-left" class="w-5 h-5"></i>
-                <span>Back</span>
-            </button>
-            <div></div>
-        </div>
-        <header class="mb-8 text-center drop-shadow-md">
-            <h1 class="text-4xl md:text-5xl font-extrabold flex justify-center items-center gap-4 mb-2 tracking-tight text-white drop-shadow-lg">
-                <div class="bg-white backdrop-blur text-black p-3 rounded-2xl shadow-lg transform -rotate-3">
-                    <i data-lucide="sparkles" class="w-8 h-8 md:w-10 md:h-10"></i> 
-                </div>
-                AI Study Assistant
-            </h1>
-            <p class="text-white text-lg font-medium drop-shadow-md">Ask Questions • Generate Study Guides • Explain Concepts</p>
-        </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Configuration Panel -->
-            <div class="glass-panel p-6 rounded-3xl h-fit">
-                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-black dark:text-white">
-                    <i data-lucide="settings" class="w-5 h-5"></i> Configuration
-                </h2>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-fuchsia-500 mb-2">AI Provider</label>
-                        <span id="assistantProviderBadge" class="text-xs font-black uppercase px-2 py-1 rounded-md bg-gray-200 text-gray-600">Detecting...</span>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-fuchsia-500 mb-2">API Key</label>
-                        <input type="password" id="assistantApiKey" oninput="detectAssistantProvider()" placeholder="Paste your API key..." 
-                            class="glass-input w-full p-3 text-sm rounded-xl outline-none font-mono">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-fuchsia-500 mb-2">Study Level</label>
-                        <select id="assistantLevel" class="glass-input w-full p-3 text-sm rounded-xl outline-none appearance-none cursor-pointer">
-                            <option value="Beginner">Beginner</option>
-                            <option value="Intermediate" selected>Intermediate</option>
-                            <option value="Advanced">Advanced</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Chat Panel -->
-            <div class="lg:col-span-2 glass-panel p-6 rounded-3xl flex flex-col" style="height: 600px;">
-                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-black dark:text-white border-b border-gray-300 pb-3">
-                    <i data-lucide="message-circle" class="w-5 h-5"></i> Assistant Chat
-                </h2>
-                
-                <div id="assistantChatBox" class="flex-grow overflow-y-auto mb-4 space-y-3 pr-2">
-                    <div class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-                        👋 Welcome! Ask me anything about your studies.
-                    </div>
-                </div>
-
-                <div class="flex gap-2">
-                    <input type="text" id="assistantInput" placeholder="Ask a question..." 
-                        class="glass-input flex-grow p-3 text-sm rounded-xl outline-none" onkeypress="handleAssistantKeypress(event)">
-                    <button onclick="sendAssistantMessage()" class="btn-3d btn-primary-3d px-4 py-2 rounded-xl font-bold flex items-center gap-2">
-                        <i data-lucide="send" class="w-4 h-4"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tools Section -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-            <!-- Study Guide Generator -->
-            <div class="glass-panel p-6 rounded-3xl">
-                <h3 class="text-lg font-bold mb-3 flex items-center gap-2 text-black dark:text-white">
-                    <i data-lucide="book" class="w-5 h-5"></i> Study Guide
-                </h3>
-                <textarea id="studyTopics" placeholder="Enter topics or content..." class="glass-input w-full p-3 text-sm rounded-xl outline-none resize-none mb-3" rows="3"></textarea>
-                <button onclick="generateStudyGuide()" class="btn-3d btn-primary-3d w-full py-2 font-bold text-sm rounded-xl">Generate Guide</button>
-            </div>
-
-            <!-- Concept Explainer -->
-            <div class="glass-panel p-6 rounded-3xl">
-                <h3 class="text-lg font-bold mb-3 flex items-center gap-2 text-black dark:text-white">
-                    <i data-lucide="lightbulb" class="w-5 h-5"></i> Explain Concept
-                </h3>
-                <input type="text" id="conceptInput" placeholder="Enter a concept..." class="glass-input w-full p-3 text-sm rounded-xl outline-none mb-3">
-                <button onclick="explainConcept()" class="btn-3d btn-primary-3d w-full py-2 font-bold text-sm rounded-xl">Get Explanation</button>
-            </div>
-
-            <!-- Q&A Helper -->
-            <div class="glass-panel p-6 rounded-3xl">
-                <h3 class="text-lg font-bold mb-3 flex items-center gap-2 text-black dark:text-white">
-                    <i data-lucide="help-circle" class="w-5 h-5"></i> Q&A Helper
-                </h3>
-                <textarea id="questionText" placeholder="Paste a question..." class="glass-input w-full p-3 text-sm rounded-xl outline-none resize-none mb-3" rows="3"></textarea>
-                <button onclick="getQuestionHelp()" class="btn-3d btn-primary-3d w-full py-2 font-bold text-sm rounded-xl">Get Help</button>
-            </div>
-        </div>
-
-        <!-- Loading and Error States -->
-        <div id="assistantLoading" class="hidden mt-6 text-center">
-            <div class="inline-flex items-center gap-3 glass-panel px-6 py-4 rounded-2xl">
-                <div class="w-4 h-4 border-2 border-blue-400 border-t-blue-600 rounded-full animate-spin"></div>
-                <span class="text-sm font-semibold text-gray-700 dark:text-gray-200">Processing...</span>
-            </div>
-        </div>
-        <div id="assistantError" class="hidden mt-6 p-4 bg-red-100/90 dark:bg-red-900/50 text-red-700 dark:text-red-200 rounded-2xl border border-red-200 dark:border-red-800 text-sm font-medium"></div>
-    </div>
 
     <script>
         lucide.createIcons();
@@ -861,8 +750,7 @@
             review: document.getElementById('reviewScreen'),
             subjectiveSetup: document.getElementById('subjectiveSetupScreen'),
             subjectiveQuiz: document.getElementById('subjectiveQuizArena'),
-            subjectiveReview: document.getElementById('subjectiveReviewScreen'),
-            assistant: document.getElementById('assistantScreen')
+            subjectiveReview: document.getElementById('subjectiveReviewScreen')
         };
         const els = { 
             backendUrl: document.getElementById('backendUrl'), 
@@ -924,8 +812,7 @@
         
         const modeLabels = {
             'mcq': 'MCQ Questions',
-            'subjective': 'Subjective (10-Mark)',
-            'assistant': 'AI Study Assistant'
+            'subjective': 'Subjective (10-Mark)'
         };
         
         function switchMode(mode) {
@@ -937,7 +824,6 @@
             // Hide all screens
             document.getElementById('setupScreen').classList.add('hidden');
             document.getElementById('subjectiveSetupScreen').classList.add('hidden');
-            document.getElementById('assistantScreen').classList.add('hidden');
             
             // Show selected screen
             if (mode === 'mcq') {
@@ -945,9 +831,6 @@
             } else if (mode === 'subjective') {
                 document.getElementById('subjectiveSetupScreen').classList.remove('hidden');
                 loadSubjectiveHistory();
-            } else if (mode === 'assistant') {
-                document.getElementById('assistantScreen').classList.remove('hidden');
-                lucide.createIcons();
             }
         }
 
@@ -1615,238 +1498,6 @@
         }
         
         function showError(msg) { els.error.textContent = msg; els.error.classList.toggle('hidden', !msg); }
-
-        // ========== AI STUDY ASSISTANT FUNCTIONS ==========
-        let assistantChatHistory = [];
-        let currentAssistantProvider = 'none';
-
-        function detectAssistantProvider() {
-            const key = document.getElementById('assistantApiKey').value.trim();
-            let provider = 'No Key';
-            if (key.startsWith('AIza')) provider = 'Gemini';
-            else if (key.startsWith('sk-')) provider = 'OpenAI';
-            else if (key.startsWith('gsk_')) provider = 'Groq';
-            currentAssistantProvider = provider.toLowerCase();
-            document.getElementById('assistantProviderBadge').textContent = provider;
-        }
-
-        function showAssistantError(msg) {
-            const errorDiv = document.getElementById('assistantError');
-            errorDiv.textContent = msg;
-            errorDiv.classList.remove('hidden');
-            setTimeout(() => errorDiv.classList.add('hidden'), 5000);
-        }
-
-        async function sendAssistantMessage() {
-            const input = document.getElementById('assistantInput');
-            const msg = input.value.trim();
-            if (!msg) return;
-
-            const apiKey = document.getElementById('assistantApiKey').value.trim();
-            if (!apiKey) {
-                showAssistantError('Please enter your API key');
-                return;
-            }
-
-            // Add user message to chat
-            const chatBox = document.getElementById('assistantChatBox');
-            const userMsgDiv = document.createElement('div');
-            userMsgDiv.className = 'flex justify-end mb-2';
-            userMsgDiv.innerHTML = `<div class="bg-blue-500 text-white p-3 rounded-2xl max-w-xs text-sm">${msg}</div>`;
-            chatBox.appendChild(userMsgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            input.value = '';
-
-            // Show loading
-            document.getElementById('assistantLoading').classList.remove('hidden');
-
-            // Prepare system prompt
-            const level = document.getElementById('assistantLevel').value;
-            const systemPrompt = `You are an expert study tutor at ${level} level. Help the student understand concepts, answer questions, and provide study guidance. Be clear, concise, and encouraging.`;
-
-            try {
-                const backendUrl = els.backendUrl.value.trim().replace(/\/+$/, '');
-                const response = await fetch(backendUrl + '/assistant-chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: msg,
-                        history: assistantChatHistory,
-                        api_key: apiKey,
-                        provider: currentAssistantProvider,
-                        systemPrompt: systemPrompt
-                    })
-                });
-
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.detail || 'Failed to get response');
-                }
-
-                // Add assistant response
-                const assistantMsgDiv = document.createElement('div');
-                assistantMsgDiv.className = 'flex justify-start mb-2';
-                assistantMsgDiv.innerHTML = `<div class="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white p-3 rounded-2xl max-w-xs text-sm">${data.response}</div>`;
-                chatBox.appendChild(assistantMsgDiv);
-                chatBox.scrollTop = chatBox.scrollHeight;
-
-                assistantChatHistory.push({ user: msg, assistant: data.response });
-
-            } catch (err) {
-                showAssistantError('Error: ' + (err.message || 'Failed to get response'));
-                console.error(err);
-            } finally {
-                document.getElementById('assistantLoading').classList.add('hidden');
-            }
-        }
-
-        function handleAssistantKeypress(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendAssistantMessage();
-            }
-        }
-
-        async function generateStudyGuide() {
-            const topics = document.getElementById('studyTopics').value.trim();
-            if (!topics) {
-                showAssistantError('Please enter topics');
-                return;
-            }
-
-            const apiKey = document.getElementById('assistantApiKey').value.trim();
-            if (!apiKey) {
-                showAssistantError('Please enter your API key');
-                return;
-            }
-
-            document.getElementById('assistantLoading').classList.remove('hidden');
-
-            const prompt = `Create a comprehensive study guide for the following topics at ${document.getElementById('assistantLevel').value} level. Include key concepts, examples, and practice tips:\n\n${topics}`;
-
-            try {
-                const backendUrl = els.backendUrl.value.trim().replace(/\/+$/, '');
-                const response = await fetch(backendUrl + '/assistant-generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        prompt: prompt,
-                        api_key: apiKey,
-                        provider: currentAssistantProvider
-                    })
-                });
-
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.detail);
-
-                // Display guide in chat
-                const chatBox = document.getElementById('assistantChatBox');
-                const guideDiv = document.createElement('div');
-                guideDiv.className = 'bg-amber-50 dark:bg-amber-900/30 p-4 rounded-2xl border border-amber-200 dark:border-amber-800 text-sm text-gray-800 dark:text-gray-200';
-                guideDiv.innerHTML = `<strong>📚 Study Guide:</strong><br>${data.content}`;
-                chatBox.appendChild(guideDiv);
-                chatBox.scrollTop = chatBox.scrollHeight;
-            } catch (err) {
-                showAssistantError('Error: ' + (err.message || 'Failed to generate guide'));
-            } finally {
-                document.getElementById('assistantLoading').classList.add('hidden');
-            }
-        }
-
-        async function explainConcept() {
-            const concept = document.getElementById('conceptInput').value.trim();
-            if (!concept) {
-                showAssistantError('Please enter a concept');
-                return;
-            }
-
-            const apiKey = document.getElementById('assistantApiKey').value.trim();
-            if (!apiKey) {
-                showAssistantError('Please enter your API key');
-                return;
-            }
-
-            document.getElementById('assistantLoading').classList.remove('hidden');
-
-            const prompt = `Explain the concept of "${concept}" in simple terms suitable for ${document.getElementById('assistantLevel').value} level students. Include real-world examples and why it matters.`;
-
-            try {
-                const backendUrl = els.backendUrl.value.trim().replace(/\/+$/, '');
-                const response = await fetch(backendUrl + '/assistant-generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        prompt: prompt,
-                        api_key: apiKey,
-                        provider: currentAssistantProvider
-                    })
-                });
-
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.detail);
-
-                // Display explanation in chat
-                const chatBox = document.getElementById('assistantChatBox');
-                const explainDiv = document.createElement('div');
-                explainDiv.className = 'bg-green-50 dark:bg-green-900/30 p-4 rounded-2xl border border-green-200 dark:border-green-800 text-sm text-gray-800 dark:text-gray-200';
-                explainDiv.innerHTML = `<strong>💡 Explanation:</strong><br>${data.content}`;
-                chatBox.appendChild(explainDiv);
-                chatBox.scrollTop = chatBox.scrollHeight;
-                document.getElementById('conceptInput').value = '';
-            } catch (err) {
-                showAssistantError('Error: ' + (err.message || 'Failed to explain'));
-            } finally {
-                document.getElementById('assistantLoading').classList.add('hidden');
-            }
-        }
-
-        async function getQuestionHelp() {
-            const question = document.getElementById('questionText').value.trim();
-            if (!question) {
-                showAssistantError('Please enter a question');
-                return;
-            }
-
-            const apiKey = document.getElementById('assistantApiKey').value.trim();
-            if (!apiKey) {
-                showAssistantError('Please enter your API key');
-                return;
-            }
-
-            document.getElementById('assistantLoading').classList.remove('hidden');
-
-            const prompt = `Help the student solve this question. Don't give the direct answer, but guide them through the solution process:\n\n${question}`;
-
-            try {
-                const backendUrl = els.backendUrl.value.trim().replace(/\/+$/, '');
-                const response = await fetch(backendUrl + '/assistant-generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        prompt: prompt,
-                        api_key: apiKey,
-                        provider: currentAssistantProvider
-                    })
-                });
-
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.detail);
-
-                // Display help in chat
-                const chatBox = document.getElementById('assistantChatBox');
-                const helpDiv = document.createElement('div');
-                helpDiv.className = 'bg-purple-50 dark:bg-purple-900/30 p-4 rounded-2xl border border-purple-200 dark:border-purple-800 text-sm text-gray-800 dark:text-gray-200';
-                helpDiv.innerHTML = `<strong>🤝 Solution Guide:</strong><br>${data.content}`;
-                chatBox.appendChild(helpDiv);
-                chatBox.scrollTop = chatBox.scrollHeight;
-                document.getElementById('questionText').value = '';
-            } catch (err) {
-                showAssistantError('Error: ' + (err.message || 'Failed to get help'));
-            } finally {
-                document.getElementById('assistantLoading').classList.add('hidden');
-            }
-        }
     </script>
 </body>
 </html>
