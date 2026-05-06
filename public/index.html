@@ -1666,7 +1666,8 @@
             const systemPrompt = `You are an expert study tutor at ${level} level. Help the student understand concepts, answer questions, and provide study guidance. Be clear, concise, and encouraging.`;
 
             try {
-                const response = await fetch('http://localhost:3000/api/assistant-chat', {
+                const backendUrl = els.backendUrl.value.trim().replace(/\/+$/, '');
+                const response = await fetch(backendUrl + '/assistant-chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1725,7 +1726,8 @@
             const prompt = `Create a comprehensive study guide for the following topics at ${document.getElementById('assistantLevel').value} level. Include key concepts, examples, and practice tips:\n\n${topics}`;
 
             try {
-                const response = await fetch('http://localhost:3000/api/assistant-generate', {
+                const backendUrl = els.backendUrl.value.trim().replace(/\/+$/, '');
+                const response = await fetch(backendUrl + '/assistant-generate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1770,7 +1772,8 @@
             const prompt = `Explain the concept of "${concept}" in simple terms suitable for ${document.getElementById('assistantLevel').value} level students. Include real-world examples and why it matters.`;
 
             try {
-                const response = await fetch('http://localhost:3000/api/assistant-generate', {
+                const backendUrl = els.backendUrl.value.trim().replace(/\/+$/, '');
+                const response = await fetch(backendUrl + '/assistant-generate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1816,7 +1819,8 @@
             const prompt = `Help the student solve this question. Don't give the direct answer, but guide them through the solution process:\n\n${question}`;
 
             try {
-                const response = await fetch('http://localhost:3000/api/assistant-generate', {
+                const backendUrl = els.backendUrl.value.trim().replace(/\/+$/, '');
+                const response = await fetch(backendUrl + '/assistant-generate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
