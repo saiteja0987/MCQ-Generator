@@ -241,6 +241,44 @@
         .theme-toggle:active {
             transform: scale(0.96);
         }
+
+        /* Floating Go Up Button */
+        .floating-go-up {
+            position: fixed;
+            right: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 40;
+            transition: all 0.3s ease;
+        }
+        
+        .floating-go-up:hover {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+        }
+        
+        .floating-go-up:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .floating-go-up {
+                position: fixed;
+                right: 20px;
+                bottom: 20px;
+                top: auto;
+                transform: none;
+            }
+            
+            .floating-go-up:hover {
+                transform: scale(1.1);
+            }
+            
+            .floating-go-up:active {
+                transform: scale(0.95);
+            }
+        }
     </style>
 </head>
 <body class="flex flex-col items-center py-8 px-4 transition-colors duration-300">
@@ -248,6 +286,12 @@
     <button onclick="toggleTheme()" class="theme-toggle" aria-label="Toggle Dark Mode">
         <i data-lucide="sun" class="w-6 h-6 text-yellow-500 hidden dark:block"></i>
         <i data-lucide="moon" class="w-6 h-6 text-fuchsia-600 block dark:hidden"></i>
+    </button>
+
+    <!-- FLOATING GO UP BUTTON -->
+    <button onclick="scrollToTop()" class="floating-go-up btn-3d btn-primary-3d px-5 py-4 font-bold text-lg flex items-center gap-2 shadow-xl rounded-xl" aria-label="Go Up">
+        <i data-lucide="arrow-up" class="w-5 h-5"></i>
+        <span class="hidden sm:inline">Go Up</span>
     </button>
 
     <!-- LEFT SIDEBAR DROPDOWN -->
@@ -307,6 +351,10 @@
                             <input type="password" id="apiKey" oninput="detectProvider()" placeholder="Paste your Gemini, Groq, or OpenAI key..." 
                                 class="glass-input w-full p-3 text-sm rounded-xl outline-none font-mono placeholder-gray-400 dark:placeholder-gray-500">
                             <p class="text-[10px] text-gray-500 mt-2 italic">Supports: AIza... (Gemini), gsk_... (Groq), sk-... (OpenAI)</p>
+                            <button onclick="window.open('https://youtu.be/ZQb6p3oa-Ds?si=Yq6INBhVZPsz4i2_', '_blank')"
+                                class="btn-3d btn-secondary-3d w-full mt-3 py-2 px-3 font-bold text-sm flex justify-center items-center gap-2 rounded-lg">
+                                <i data-lucide="youtube" class="w-4 h-4"></i> How to Get Gemini API Key
+                            </button>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
@@ -421,7 +469,7 @@
                 </div>
         </div>
 
-        <div class="mt-8 flex justify-between gap-4 animate-enter">
+        <div class="mt-8 flex justify-between gap-4 animate-enter flex-wrap">
             <button id="prevBtn" onclick="prevQuestion()"
                 class="hidden btn-3d btn-secondary-3d px-8 py-4 font-bold text-lg flex items-center gap-2 shadow-xl opacity-80 hover:opacity-100">
                 <i data-lucide="arrow-left" class="w-5 h-5"></i> Prev
@@ -430,6 +478,11 @@
             <button id="skipBtn" onclick="skipQuestion()"
                 class="px-8 py-4 font-bold text-lg flex items-center gap-2 shadow-xl rounded-lg transition-all cursor-pointer bg-orange-500 hover:bg-orange-600 text-white active:scale-95">
                 <i data-lucide="forward" class="w-5 h-5"></i> Skip
+            </button>
+
+            <button id="goUpBtn" onclick="scrollToTop()"
+                class="btn-3d btn-primary-3d px-8 py-4 font-bold text-lg flex items-center gap-2 shadow-xl transition-all duration-200">
+                <i data-lucide="arrow-up" class="w-5 h-5"></i> Go Up
             </button>
 
             <button id="nextBtn" onclick="nextQuestion()"
@@ -530,6 +583,10 @@
                             <input type="password" id="subjectiveApiKey" oninput="detectSubjectiveProvider()" placeholder="Paste your Gemini, Groq, or OpenAI key..." 
                                 class="glass-input w-full p-3 text-sm rounded-xl outline-none font-mono placeholder-gray-400 dark:placeholder-gray-500">
                             <p class="text-[10px] text-gray-500 mt-2 italic">Supports: AIza... (Gemini), gsk_... (Groq), sk-... (OpenAI)</p>
+                            <button onclick="window.open('https://youtu.be/ZQb6p3oa-Ds?si=Yq6INBhVZPsz4i2_', '_blank')"
+                                class="btn-3d btn-secondary-3d w-full mt-3 py-2 px-3 font-bold text-sm flex justify-center items-center gap-2 rounded-lg">
+                                <i data-lucide="youtube" class="w-4 h-4"></i> How to Get Gemini API Key
+                            </button>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
@@ -1246,6 +1303,13 @@
                 currentQuestionIndex--;
                 renderQuestion();
             }
+        }
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         }
 
         function submitQuiz() {
